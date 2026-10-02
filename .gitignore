@@ -45,3 +45,6 @@ yarn-error.log*
 .idea/
 .vscode/*
 !.vscode/extensions.json
+
+# generated font cache for scripts/og-card.py
+/.cache
