@@ -1,0 +1,369 @@
+@import './sections.css';
+
+/* ==================================================================
+   TOKENS
+   ================================================================== */
+
+@property --accent {
+  syntax: '<color>';
+  inherits: true;
+  initial-value: #b14aff;
+}
+@property --accent-soft {
+  syntax: '<color>';
+  inherits: true;
+  initial-value: #2ed9ff;
+}
+
+:root {
+  --bg: #07070a;
+  --bg-elev: #0d0d13;
+  --fg: #f4f2ec;
+  --muted: #8b8b99;
+  --faint: #55555f;
+  --line: rgba(244, 242, 236, 0.11);
+  --line-strong: rgba(244, 242, 236, 0.26);
+
+  --purple: #b14aff;
+  --green: #9dff2e;
+  --pink: #ff2e88;
+  --blue: #2ed9ff;
+  --orange: #ff7a1a;
+
+  --accent: var(--purple);
+  --accent-soft: var(--blue);
+
+  --vel: 0; /* -1 … 1 smoothed scroll velocity */
+  --vel-abs: 0; /* 0 … 1 */
+
+  --nav-h: 76px;
+  --gut: clamp(18px, 4.2vw, 76px);
+  /* keeps right-aligned content clear of the fixed chapter rail */
+  --rail-space: 0px;
+
+  /* fluid display scale */
+  --d0: clamp(4.5rem, 26vw, 25rem);
+  --d1: clamp(3.4rem, 17vw, 16rem);
+  --d2: clamp(2.6rem, 11vw, 10rem);
+  --d3: clamp(2rem, 6.6vw, 6rem);
+  --d4: clamp(1.5rem, 3.6vw, 3.2rem);
+  --body: clamp(1rem, 0.72rem + 0.6vw, 1.35rem);
+  --small: clamp(0.82rem, 0.74rem + 0.2vw, 0.95rem);
+
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+
+  color-scheme: dark;
+  transition: --accent 700ms var(--ease-out), --accent-soft 700ms var(--ease-out);
+}
+
+/* ==================================================================
+   RESET
+   ================================================================== */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  overflow-x: clip;
+  scroll-behavior: auto;
+  -webkit-text-size-adjust: 100%;
+}
+@supports not (overflow: clip) {
+  html {
+    overflow-x: hidden;
+  }
+}
+
+body {
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--font-display), 'Helvetica Neue', Arial, sans-serif;
+  font-size: var(--body);
+  line-height: 1.5;
+  overflow-x: clip;
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+/* The detail overlay locks the page. We deliberately do NOT clamp the body
+   height here: that collapses the scroll range and the browser throws away the
+   reader's position. Lenis is stopped instead, and the exact offset is restored
+   on close. */
+body.is-locked {
+  overflow: hidden;
+  overscroll-behavior: none;
+}
+
+img,
+svg,
+canvas,
+video {
+  display: block;
+  max-width: 100%;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button {
+  font: inherit;
+  color: inherit;
+  background: none;
+  border: 0;
+  cursor: pointer;
+}
+
+ul,
+ol {
+  list-style: none;
+}
+
+::selection {
+  background: var(--accent);
+  color: #05050a;
+}
+
+@media (min-width: 900px) {
+  :root {
+    --rail-space: 78px;
+  }
+}
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 4px;
+  border-radius: 2px;
+}
+
+.skip-link {
+  position: fixed;
+  top: 10px;
+  left: 10px;
+  z-index: 999;
+  padding: 10px 16px;
+  background: var(--fg);
+  color: #07070a;
+  font-family: var(--font-mono), monospace;
+  font-size: 0.78rem;
+  letter-spacing: 0.1em;
+  border-radius: 999px;
+  transform: translateY(-200%);
+  transition: transform 0.3s var(--ease-out);
+}
+.skip-link@media (min-width: 900px) {
+  :root {
+    --rail-space: 78px;
+  }
+}
+
+:focus-visible {
+  transform: translateY(0);
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* ==================================================================
+   TYPE PRIMITIVES
+   ================================================================== */
+
+.display {
+  font-family: var(--font-display), 'Arial Black', sans-serif;
+  font-weight: 900;
+  line-height: 0.82;
+  letter-spacing: -0.045em;
+  text-transform: uppercase;
+  font-variation-settings: 'wdth' 100;
+}
+
+.display-wide {
+  font-variation-settings: 'wdth' 125;
+}
+.display-narrow {
+  font-variation-settings: 'wdth' 70;
+}
+
+.outline {
+  color: transparent;
+  -webkit-text-stroke: clamp(1px, 0.14vw, 2.4px) var(--fg);
+}
+.outline-accent {
+  color: transparent;
+  -webkit-text-stroke: clamp(1px, 0.14vw, 2.4px) var(--accent);
+}
+
+.label {
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: clamp(0.62rem, 0.58rem + 0.14vw, 0.78rem);
+  letter-spacing: 0.26em;
+  text-transform: uppercase;
+  color: var(--muted);
+  font-weight: 500;
+}
+.label-accent {
+  color: var(--accent);
+}
+
+.mono {
+  font-family: var(--font-mono), ui-monospace, monospace;
+}
+
+.body-text {
+  font-size: var(--body);
+  line-height: 1.55;
+  color: color-mix(in oklab, var(--fg) 86%, transparent);
+  letter-spacing: -0.01em;
+  font-weight: 400;
+}
+
+.muted {
+  color: var(--muted);
+}
+
+/* editable placeholder styling */
+.ph {
+  color: var(--faint);
+  border-bottom: 1px dashed color-mix(in oklab, var(--accent) 55%, transparent);
+  padding-bottom: 1px;
+  font-style: normal;
+}
+
+/* ==================================================================
+   LAYOUT PRIMITIVES
+   ================================================================== */
+
+.chapter {
+  position: relative;
+  width: 100%;
+}
+
+.stage {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  height: 100svh;
+  width: 100%;
+  overflow: clip;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.wrap {
+  width: 100%;
+  max-width: 1680px;
+  margin-inline: auto;
+  padding-inline: var(--gut);
+}
+
+.full {
+  position: absolute;
+  inset: 0;
+}
+
+.center {
+  display: grid;
+  place-items: center;
+}
+
+/* ==================================================================
+   GRAIN / NOISE OVERLAY
+   ================================================================== */
+
+.grain {
+  position: fixed;
+  inset: -120px;
+  z-index: 60;
+  pointer-events: none;
+  opacity: 0.4;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='260' height='260'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.42'/%3E%3C/svg%3E");
+  mix-blend-mode: soft-light;
+  animation: grainShift 0.9s steps(5) infinite;
+  will-change: transform;
+}
+
+@keyframes grainShift {
+  0% {
+    transform: translate3d(0, 0, 0);
+  }
+  20% {
+    transform: translate3d(-24px, 10px, 0);
+  }
+  40% {
+    transform: translate3d(14px, -18px, 0);
+  }
+  60% {
+    transform: translate3d(-10px, 22px, 0);
+  }
+  80% {
+    transform: translate3d(20px, 6px, 0);
+  }
+  100% {
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+.scanlines {
+  position: fixed;
+  inset: 0;
+  z-index: 59;
+  pointer-events: none;
+  opacity: 0.16;
+  background: repeating-linear-gradient(
+    to bottom,
+    rgba(255, 255, 255, 0.045) 0px,
+    rgba(255, 255, 255, 0.045) 1px,
+    transparent 1px,
+    transparent 3px
+  );
+}
+
+.vignette {
+  position: fixed;
+  inset: 0;
+  z-index: 58;
+  pointer-events: none;
+  background: radial-gradient(130% 95% at 50% 45%, transparent 48%, rgba(0, 0, 0, 0.72) 100%);
+}
+
+/* ==================================================================
+   REDUCED MOTION
+   ================================================================== */
+
+@media (prefers-reduced-motion: reduce) {
+  .grain {
+    animation: none;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.12s !important;
+  }
+  html {
+    scroll-behavior: auto;
+  }
+}
